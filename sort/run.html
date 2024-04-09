@@ -16,13 +16,21 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const algo = urlParams.get('algo');
-        const arr = Array.from({length: 70}, () => Math.floor(Math.random() * 80));
+
+        // Create sorted array and shuffle it
+        const ARR_SIZE = 70;
+        let arr = [];
+
+        for (let i = 0; i < ARR_SIZE; i++) {
+            arr.push(i+1);
+        }
+
+        arr = arr.sort((a, b) => 0.5 - Math.random());
 
         render();
 
         // Show bars on the screen
-        const renderDelay = 50;
-        
+        const renderDelay = 50;       
         function render() {
             document.body.innerHTML = "";
             const bars = document.createElement('div');
@@ -110,10 +118,9 @@
                 while (j >= 0 && arr[j - 1] > arr[j]) {
                     swap(j, j - 1);
                     j--;
+                    render();
+                    await new Promise(resolve => setTimeout(resolve, renderDelay));
                 }
-
-                render();
-                await new Promise(resolve => setTimeout(resolve, renderDelay));
             }
         }
 
