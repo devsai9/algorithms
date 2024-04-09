@@ -64,7 +64,7 @@
                 insertionSort();
                 break;
             case 'merge':
-                mergeSort();
+                mergeSort(arr);
                 break;
             default:
                 arr;
@@ -125,16 +125,51 @@
         }
 
         // MERGE SORT
-        async function mergeSort(arrL) {
-            if (arr.length <= 1) return arrL;
+        function mergeSort(arr) {
+            if (arr.length <= 1) return arr;
             let mid = Math.floor(arr.length/2);
+
             let arr1 = [];
             let arr2 = [];
-            
+            let j = 0;
+            for (let i = 0; i < arr.length; i++) {
+                if (i < mid) {
+                    arr1.push(arr[i]);
+                } else {
+                    arr2.push(arr[i]);
+                    j++;
+                }
+            }
+
+            mergeSort(arr1);
+            mergeSort(arr2);
+            merge(arr1, arr2);
         }
 
         async function merge(arrL, arr2L) {
+            let arr3 = [];
+            
+            while(arrL.length > 0 && arr2L.length) {
+                if (arrL[0] > arr2L[0]) {
+                    arr3.push(arr2L[0]);
+                    arr2L.shift();
+                } else {
+                    arr3.push(arrL[0]);
+                    arrL.shift();
+                }
+            }
 
+            while(arrL.length > 0) {
+                arr3.push(arrL[0]);
+                arrL.shift();
+            }
+
+            while(arr2L.length > 0) {
+                arr3.push(arr2L[0]);
+                arr2L.shift();
+            }
+
+            render();
         }
 
     </script>
