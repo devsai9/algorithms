@@ -30,8 +30,9 @@
         render();
 
         // Show bars on the screen
-        const renderDelay = 50;       
-        function render() {
+        const renderDelay = 20;       
+        function render(arrL) {
+            if(arrL == null) arrL = arr;
             document.body.innerHTML = "";
             const bars = document.createElement('div');
             bars.style.display = 'flex';
@@ -41,7 +42,7 @@
             bars.style.width = '100%';
             bars.style.backgroundColor = 'black';
         
-            arr.forEach((value, index) => {
+            arrL.forEach((value, index) => {
                 const bar = document.createElement('div');
                 bar.style.width = '10px';
                 bar.style.height = `${value * 10}px`;
@@ -66,6 +67,8 @@
             case 'merge':
                 mergeSort(arr);
                 break;
+            case 'heap':
+                heapSort(arr);
             default:
                 arr;
                 break;
@@ -80,6 +83,7 @@
 
         // BUBBLE SORT
         async function bubbleSort() {
+            await new Promise(resolve => setTimeout(resolve, 1000));
             for (let i = 1; i < arr.length; i++) {
                 let swapped = false;
                 for (let j = 0; j < arr.length - i; j++) {
@@ -96,6 +100,7 @@
 
         // SELECTION SORT
         async function selectionSort() {
+            await new Promise(resolve => setTimeout(resolve, 1000));
             for (let i = 0; i < arr.length; i++) {
                 let minI = i;
 
@@ -112,6 +117,7 @@
 
         // INSERTION SORT
         async function insertionSort() {
+            await new Promise(resolve => setTimeout(resolve, 1000));
             for (let i = 0; i < arr.length; i++) {
                 let j = i + 1;
 
@@ -125,52 +131,81 @@
         }
 
         // MERGE SORT
-        function mergeSort(arr) {
-            if (arr.length <= 1) return arr;
-            let mid = Math.floor(arr.length/2);
+        async function mergeSort(arrL, start = 0, end = arrL.length) {
+            if (arrL.length <= 1) return arrL;
 
-            let arr1 = [];
-            let arr2 = [];
-            let j = 0;
-            for (let i = 0; i < arr.length; i++) {
-                if (i < mid) {
-                    arr1.push(arr[i]);
-                } else {
-                    arr2.push(arr[i]);
-                    j++;
-                }
-            }
+            let mid = Math.floor(arrL.length/2);
 
-            mergeSort(arr1);
-            mergeSort(arr2);
-            merge(arr1, arr2);
+            let leftArr = await mergeSort(arrL.slice(0, mid), start, start + mid);
+            let rightArr = await mergeSort(arrL.slice(mid), start + mid, end);
+
+            return await merge(leftArr, rightArr, start, end);
         }
 
-        async function merge(arrL, arr2L) {
+        async function merge(leftArr, rightArr, start, end) {
             let arr3 = [];
-            
-            while(arrL.length > 0 && arr2L.length) {
-                if (arrL[0] > arr2L[0]) {
-                    arr3.push(arr2L[0]);
-                    arr2L.shift();
+
+            while ((leftArr.length > 0) && (rightArr.length > 0)) {
+                if (leftArr[0] > rightArr[0]) {
+                    arr3.push(rightArr.shift());
                 } else {
-                    arr3.push(arrL[0]);
-                    arrL.shift();
+                    arr3.push(leftArr.shift());
                 }
+                render();
+                // await new Promise(resolve => setTimeout(resolve, renderDelay));
             }
 
-            while(arrL.length > 0) {
-                arr3.push(arrL[0]);
-                arrL.shift();
-            }
+            arr3 = arr3.concat(leftArr, rightArr);
 
-            while(arr2L.length > 0) {
-                arr3.push(arr2L[0]);
-                arr2L.shift();
+            for (let i = start; i < end; i++) {
+                arr[i] = arr3[i - start];
+                render();
+                // await new Promise(resolve => setTimeout(resolve, renderDelay));
             }
 
             render();
+            await new Promise(resolve => setTimeout(resolve, renderDelay));
+
+            return arr3;
         }
+
+        // HEAP SORT
+        async function heapSort() {
+            let n = arr.length;
+
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--)
+                await heapify(arr, n, i);
+
+            for (let i = n - 1; i > 0; i--) {
+                swap(0, i);
+
+                render(arr);
+                await new Promise(resolve => setTimeout(resolve, renderDelay));
+                await heapify(arr, i, 0);
+            }
+        }
+
+        
+        async function heapify(arr, n, i) {
+            let largest = i;
+            let left = 2 * i + 1;
+            let right = 2 * i + 2;
+
+            if (left < n && arr[left] > arr[largest])
+                largest = left;
+
+            if (right < n && arr[right] > arr[largest])
+                largest = right;
+
+            if (largest !== i) {
+                swap(i, largest)
+
+                render(arr);
+                await new Promise(resolve => setTimeout(resolve, renderDelay));
+                return heapify(arr, n, largest);
+            }
+        }
+
 
     </script>
 </body>
